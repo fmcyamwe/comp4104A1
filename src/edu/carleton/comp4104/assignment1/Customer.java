@@ -6,9 +6,6 @@
 
 package edu.carleton.comp4104.assignment1;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 public class Customer implements Runnable{
 
 	private static int numInstances = 0;
@@ -53,6 +50,7 @@ public class Customer implements Runnable{
 		return (other.getInstanceNumber() == myInstance);
 	}
 	
+	@Override
 	public void run(){
 
 		try {
@@ -84,13 +82,10 @@ public class Customer implements Runnable{
 			
 			mySalon.postOnSalonMessageBoard(this + " needs a haircut");
 			
+			//Blocking call
 			mySalon.waitForHaircut(this);
-			//We'll have left that call either because the salon closed before we could get in
-			//or because we're going to get our hair cut
-			if(mySalon.salonOpen()){
-				mySalon.waitForBarberToFinish(this);
-			}
-			
+			//We'll have left that call only if we got our hair cut or if the salon is closed. 
+			//Either way, the loop will handle the next step appropriately.
 			
 		}
 		

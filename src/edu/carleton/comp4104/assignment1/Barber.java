@@ -42,13 +42,17 @@ public class Barber implements Runnable{
 			
 			//Blocking call
 			currentCustomer = mySalon.nextCustomer(currentCustomer);
-			mySalon.postOnSalonMessageBoard(currentCustomer + " getting haircut for " + timeToCut + " ms");
-			try {
-				Thread.sleep(timeToCut);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			
+			if(currentCustomer != null){
+				mySalon.postOnSalonMessageBoard(currentCustomer + " getting haircut for " + timeToCut + " ms");
+				try {
+					Thread.sleep(timeToCut);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			//If currentCustomer is null, the salon's closed. The loop will take care of it.
 
 		}
 		

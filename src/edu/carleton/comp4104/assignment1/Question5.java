@@ -39,7 +39,7 @@ public class Question5 {
 	public static void main(String[] args) {
 		int argNum = 0;
 		boolean seenNumCust = false, seenNumBarbs = false, seenGrowTime = false, seenCuttingTime = false, seenNumChairs = false, seenRuntime = false;		
-		final int numArgsBarber = 12;
+		final int requiredNumArgs = 12;
 		int numCustomers = 0;
 		int numBarbers = 0;
 		int maxGrowTime = 0;
@@ -48,15 +48,18 @@ public class Question5 {
 		int runtime = 0;
 		Timer runtimeTimer = new Timer("Salon Close Timer");
 		Salon mySalon;
+		Customer[] myCustomers;
+		Barber[] myBarbers;
+		Thread[] myThreads;
 		
 		//Parse and ensure proper arguments
-		if(args.length != numArgsBarber){
+		if(args.length != requiredNumArgs){
 			System.out.println("Insufficient number of arguments.");
 			printHelpMessage();
 			return;
 		}
 		
-		while(argNum < numArgsBarber){
+		while(argNum < requiredNumArgs){
 			switch(args[argNum++]){
 				case("-C"):
 					try{
@@ -171,8 +174,38 @@ public class Question5 {
 		System.out.println("customers " + numCustomers + ", barber " + numBarbers + ",grow time " + maxGrowTime + 
 				", cut time " + maxCutTime + ", chairs " + numChairs + ", runtime " + runtime);
 
+		myBarbers = new Barber[numBarbers];
+		myCustomers = new Customer[numCustomers];
+		myThreads = new Thread[numBarbers + numCustomers];
+		
+		mySalon = new Salon(numChairs, numBarbers, runtime);
+		
+		for(int i = 0; i < numBarbers; ++i){
+			myBarbers[i] = new Barber(mySalon, maxCutTime);
+			myThreads[i] = new Thread(myBarbers[i], "Barber " + (i + 1));
+			myThreads[i].start();
+		}
+		
+		for(int i = 0; i < numCustomers; ++i){
+			myCustomers[i] = new Customer(mySalon, maxGrowTime);
+			myThreads[i + numBarbers] = new Thread(myCustomers[i], myCustomers[i].toString());
+			myThreads[i + numBarbers].start();			
+		}
+		
 		//Schedule our task to close the salon after 'runtime' seconds has elapsed.
 		runtimeTimer.schedule(new SalonCloser(mySalon), (long) (runtime * millisecondsInSeconds));
+		
+		mySalon.startDay();
+		
+		//Wait for all of the Barbers and Customers to finish.
+		for(Thread t:myThreads){
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		mySalon.closingPerimiterCheck();
 	}

@@ -44,9 +44,8 @@ public class Salon {
 	/**
 	 * Releases the latch to start all of the Customers and Barbers.
 	 * Also sets the startTime.
-	 * @throws InterruptedException
 	 */
-	public synchronized void startDay() throws InterruptedException{
+	public synchronized void startDay(){
 		dayStarted = true;
 		startTime = System.currentTimeMillis();
 		notifyAll();
@@ -90,9 +89,8 @@ public class Salon {
 	 * This function is used by Customers to get themselves into the Salon waiting room. This is a blocking call.
 	 * The Customer will only wait as long as the salon will remain open. That way whoever's not
 	 * in the waiting room when the timer goes off won't be stuck.
-	 * After this call, the Customer must check if they're in the Salon before they start their next cycle.
+	 * Once in the waiting room, the Customer waits until their hair is cut.
 	 * @param c The Customer that is trying to get into the waiting room to cut their hair.
-	 * @return CyclicBarrier to wait on before the customer should start growing their hair again.
 	 */
 	public synchronized void waitForHaircut(Customer c){
 		long timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
@@ -102,10 +100,24 @@ public class Salon {
 				//Try to get into the waiting room, only wait max as long as the salon will remain open, that way whoever's not
 				//in the waiting room when the timer goes off won't be stuck
 				if(waitingChairs.offer(c, timeRemaining, TimeUnit.MILLISECONDS)){
+					
 					postOnSalonMessageBoard(c + " in room, waiting=" + waitingChairs.size());
 					if(!paymentBarriers.containsKey(c)){
 						paymentBarriers.put(c, new CyclicBarrier(2));
 					}
+					//Now that we're in the waiting room, wait until our hair is cut.
+					CyclicBarrier haircutDone = paymentBarriers.get(c);
+					if(haircutDone != null){
+						try {
+							haircutDone.await();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (BrokenBarrierException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}			
+					}					
 				}
 				
 			} catch (InterruptedException e) {
@@ -117,35 +129,25 @@ public class Salon {
 		return;
 	}
 	
-	public synchronized void waitForBarberToFinish(Customer c){
-		CyclicBarrier haircutDone = paymentBarriers.get(c);
-		if(haircutDone != null){
-			try {
-				haircutDone.await();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (BrokenBarrierException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
-		}
-	}
-	
 	/**
-	 * This function is used by Barbers to grab the next waiting Customer. This is a blocking call. 
+	 * This function is used by Barbers.
+	 * It does two things: it finishes processing on the Customer whose hair they just finished cutting and
+	 * it grabs the next waiting Customer. This is a blocking call. 
 	 * If no Customers arrive by the time the salon closes, we return null.
 	 * We also return null if we had an InterruptedException while waiting.  
-	 * @return The next Customer in line to have their hair cut or null if we timed out or had an exception.
+	 * @param oldCustomer The Customer whose hair we just finished cutting.
+	 * @return The next Customer in line to have their hair cut or null if we timed out or had an exception while waiting for 
+	 * our next Customer.
 	 */
 	public synchronized Customer nextCustomer(Customer oldCustomer){
 		Customer c = null;
 		long timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
 
 		//On the first run, the oldCustomer will be null.
+		//If we had a Customer, remove them from processing by taking them out of the barberChairs and signaling their barrier.
 		if(oldCustomer != null){
 			barberChairs.remove(oldCustomer);
-			if(!paymentBarriers.containsKey(oldCustomer)){
+			if(paymentBarriers.containsKey(oldCustomer)){
 				try {
 					//This will trip the barrier that the Customer's waiting on.
 					CyclicBarrier temp = paymentBarriers.get(oldCustomer);
@@ -160,6 +162,8 @@ public class Salon {
 					e.printStackTrace();
 				}
 				paymentBarriers.remove(oldCustomer);
+			} else {
+				System.out.println("Error: A Barber had a Customer that wasn't waiting for their hair to be cut.");
 			}
 		}
 		
@@ -167,7 +171,7 @@ public class Salon {
 		System.out.print("time=" + ((System.currentTimeMillis() - startTime)/ numMSsInSecs) + " secs, " +
 		"Barber free");
 		
-		if((timeRemaining > 0) || (waitingChairs.contains(c))){
+		if((timeRemaining > 0) || (customerWaiting())){
 			try {
 				System.out.println(", waiting for a customer");
 				//Try to grab the next waiting customer, only wait max as long as the salon will remain open, that way whoever's not
@@ -208,11 +212,8 @@ public class Salon {
 	 * @return True if the Customer is waiting for a cut or being cut, false if the Customer's not in the salon.
 	 */
 	public synchronized boolean inSalon(Customer c){
-		if(waitingChairs.contains(c) || barberChairs.contains(c)){
-			return true;
-		}
-		
-		return false;
+		//paymentBarriers will only contain the key if (waitingChairs.contains(c) || barberChairs.contains(c))) is true
+		return paymentBarriers.containsKey(c);
 	}
 	
 	public synchronized void closingPerimiterCheck(){
