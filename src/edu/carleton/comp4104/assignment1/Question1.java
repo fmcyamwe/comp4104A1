@@ -8,13 +8,13 @@ package edu.carleton.comp4104.assignment1;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
+//import java.util.concurrent.CountDownLatch;
 
 public class Question1{
 	
 	public static void main(String[] args) {
 		
-		CountDownLatch latch = new CountDownLatch(1);
+		//CountDownLatch latch = new CountDownLatch(1);
 		String s = args[0];
 		int length = s.length();
 		char [] characters = new char[length]; // fill it up with characters in order of first character at zero index
@@ -32,7 +32,7 @@ public class Question1{
 		//Printer.print.get(0) = true;
 		
 		for(int i = 0;i<length; i++	){
-			Thread t = new Thread(new Printer(characters[i], latch, i), "Thread "+i);
+			Thread t = new Thread(new Printer(characters[i], i), "Thread "+i);
 			t.start();
 		}
 		

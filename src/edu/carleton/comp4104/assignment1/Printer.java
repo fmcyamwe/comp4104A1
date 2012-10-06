@@ -10,17 +10,17 @@ package edu.carleton.comp4104.assignment1;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
+//import java.util.concurrent.CountDownLatch;
 
 public class Printer implements Runnable{
-	CountDownLatch latch = null;
+	//CountDownLatch latch = null;
 	static ArrayList <Boolean> print; 
 	char character;
 	int order;
 	
 	
-	public Printer(char character, CountDownLatch latch, int order){
-		this.latch = latch;
+	public Printer(char character, int order){
+		//this.latch = latch;
 		this.character = character;
 		this.order = order;
 		//print[0] = true;
