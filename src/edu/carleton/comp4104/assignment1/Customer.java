@@ -116,7 +116,16 @@ public class Customer implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}			
-			}				
+			} else {
+				//If we're returned a null Barrier, the salon is about to close. Sleep for a little bit so our loop
+				//condition works properly.
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			
 		}
 		

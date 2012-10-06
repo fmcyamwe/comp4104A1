@@ -166,8 +166,8 @@ public class Question5 {
 			return;
 		}
 		
-		System.out.println("customers " + numCustomers + ", barber " + numBarbers + ",grow time " + maxGrowTime + 
-				", cut time " + maxCutTime + ", chairs " + numChairs + ", runtime " + runtime);
+		System.out.println("customers " + numCustomers + ", barber " + numBarbers + ", max grow time " + maxGrowTime + 
+				", max cut time " + maxCutTime + ", chairs " + numChairs + ", runtime " + runtime);
 
 		myBarbers = new Barber[numBarbers];
 		myCustomers = new Customer[numCustomers];

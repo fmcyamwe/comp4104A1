@@ -11,7 +11,6 @@ import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.TimeUnit;
 
 public class Salon {
 
@@ -109,8 +108,35 @@ public class Salon {
 			try {				
 				//Try to get into the waiting room, only wait max as long as the salon will remain open, that way whoever's not
 				//in the waiting room when the timer goes off won't be stuck
-				if(waitingChairs.offer(c, timeRemaining, TimeUnit.MILLISECONDS)){
-					notify();
+				boolean inWaitingRoom = waitingChairs.offer(c);
+				
+				if(!inWaitingRoom){
+					long tempStart, tempEnd, tempWait;
+					tempStart = System.currentTimeMillis();
+					wait(((timeRemaining > 0) ? timeRemaining : 10));
+					tempEnd = System.currentTimeMillis();
+					tempWait = timeRemaining - (tempEnd - tempStart);
+							
+					inWaitingRoom = waitingChairs.offer(c);
+					
+					while((!inWaitingRoom) && (0 < tempWait)){
+						//We're here if we broke out of the wait early.
+						//tempWait must be positive here because that subtracted difference is always positive or in an unlikely case 0.
+						//This will ensure that we never wait less than the time remaining.
+						
+						tempStart = System.currentTimeMillis();
+						wait(tempWait);
+						tempEnd = System.currentTimeMillis();
+						
+						tempWait = tempWait - (tempEnd - tempStart);
+						
+						inWaitingRoom = waitingChairs.offer(c);					
+					}						
+				}
+				
+				if(inWaitingRoom){
+					//Notify any waiting Barbers (and sleeping Customers by side-effect) that waitingChairs changed
+					notifyAll();
 					postOnSalonMessageBoard(c + " in room, waiting=" + waitingChairs.size());
 					if(!paymentBarriers.containsKey(c)){
 						paymentBarriers.put(c, new CyclicBarrier(2));
@@ -198,11 +224,13 @@ public class Salon {
 						tempWait = tempWait - (tempEnd - tempStart);
 						
 						c = waitingChairs.poll();
-					}			
+					}	
 				}
 			
 				//If there is a Customer whose hair we must cut, put them in a Barber's chair.
 				if(c != null){
+					//Notify any waiting customers (and sleeping Barbers by side-effect) that waitingChairs changed
+					notifyAll();					
 					barberChairs.put(c);
 					postOnSalonMessageBoard("Barber has customer, waiting=" + waitingChairs.size());
 					postOnSalonMessageBoard("Barber cutting hair");			
