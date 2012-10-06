@@ -30,6 +30,7 @@ public class Barber implements Runnable{
 			e.printStackTrace();
 		}
 		
+		//As long as the salon's open or there are customers, keep going
 		while(mySalon.salonOpen() || mySalon.customerWaiting() || (currentCustomer != null)){
 			long timeToCut;
 			//We want to sleep using ms, so if we can get a random time in ms, convert and do it. Otherwise, get a random number
@@ -45,6 +46,8 @@ public class Barber implements Runnable{
 
 			if(currentCustomer != null){
 				mySalon.postOnSalonMessageBoard(currentCustomer + " getting haircut for " + timeToCut + " ms");
+				
+				//Make sure we cut hair for at least the time we say we will
 				try {
 					long tempStart, tempEnd, tempWait;
 					tempStart = System.currentTimeMillis();
@@ -53,7 +56,7 @@ public class Barber implements Runnable{
 					tempWait = timeToCut - (tempEnd - tempStart);
 					
 					while(0 < tempWait){
-						//Make sure we cut for at least the time we say we will
+						//There's still some time left to cut
 						tempStart = System.currentTimeMillis();
 						Thread.sleep(tempWait);
 						tempEnd = System.currentTimeMillis();
@@ -68,7 +71,7 @@ public class Barber implements Runnable{
 			}
 			//If currentCustomer is null, the salon's closed. The loop will take care of it.
 
-		}
+		} /* while(mySalon.salonOpen() || mySalon.customerWaiting() || (currentCustomer != null)) */
 		
 		mySalon.postOnSalonMessageBoard("A Barber has left, the salon is closed and there are no more customers.");
 		

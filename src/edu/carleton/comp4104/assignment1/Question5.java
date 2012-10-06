@@ -169,12 +169,14 @@ public class Question5 {
 		System.out.println("customers " + numCustomers + ", barber " + numBarbers + ", max grow time " + maxGrowTime + 
 				", max cut time " + maxCutTime + ", chairs " + numChairs + ", runtime " + runtime);
 
+		//Now that we know suitable arguments have been passed in, instantiate the required variables
 		myBarbers = new Barber[numBarbers];
 		myCustomers = new Customer[numCustomers];
 		myThreads = new Thread[numBarbers + numCustomers];
 		
 		mySalon = new Salon(numChairs, numBarbers, runtime);
 		
+		//We can start these threads right away because they wait on a latch in the salon object
 		for(int i = 0; i < numBarbers; ++i){
 			myBarbers[i] = new Barber(mySalon, maxCutTime);
 			myThreads[i] = new Thread(myBarbers[i], "Barber " + (i + 1));
@@ -187,6 +189,7 @@ public class Question5 {
 			myThreads[i + numBarbers].start();			
 		}
 		
+		//Releases the latch, lets our threads start at the same time. Also sets up the program timer.
 		mySalon.startDay();
 		
 		//Wait for all of the Barbers and Customers to finish.
@@ -199,6 +202,7 @@ public class Question5 {
 			}
 		}
 		
+		//Check if we missed any Customers in the salon.
 		mySalon.closingPerimiterCheck();
 		
 		return;

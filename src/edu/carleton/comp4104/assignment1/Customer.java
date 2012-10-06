@@ -65,6 +65,7 @@ public class Customer implements Runnable{
 		
 		while(mySalon.salonOpen()){
 			long timeToGrow;
+			//This barrier is returned by the salon. We wait on it to know when we're done getting our hair cut.
 			CyclicBarrier haircutDone;
 
 			//We want to sleep using ms, so if we can get a random time in ms, convert and do it. Otherwise, get a random number
@@ -77,6 +78,7 @@ public class Customer implements Runnable{
 			
 			mySalon.postOnSalonMessageBoard(this + " growing hair for " + timeToGrow + " ms");
 			
+			//Make sure we grow hair for at least the time we say we will
 			try {
 				long tempStart, tempEnd, tempWait;
 				tempStart = System.currentTimeMillis();				
@@ -85,7 +87,7 @@ public class Customer implements Runnable{
 				tempWait = timeToGrow - (tempEnd - tempStart);
 				
 				while(0 < tempWait){
-					//Make sure we grow for at least the time we say we will
+					//There's still some time left to grow
 					tempStart = System.currentTimeMillis();
 					Thread.sleep(tempWait);
 					tempEnd = System.currentTimeMillis();
@@ -127,7 +129,7 @@ public class Customer implements Runnable{
 				}
 			}
 			
-		}
+		} /* while(mySalon.salonOpen()) */
 		
 		mySalon.postOnSalonMessageBoard(this + " went home because the salon was closed.");
 		
