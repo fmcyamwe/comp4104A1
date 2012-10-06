@@ -6,6 +6,9 @@
 
 package edu.carleton.comp4104.assignment1;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 public class Customer implements Runnable{
 
 	private static int numInstances = 0;
@@ -62,11 +65,12 @@ public class Customer implements Runnable{
 		
 		while(mySalon.salonOpen()){
 			long timeToGrow;
+			CyclicBarrier haircutDone;
 
 			//We want to sleep using ms, so if we can get a random time in ms, convert and do it. Otherwise, get a random number
 			//of seconds (opposed to ms) and convert that to ms.
-			if(((maxGrowTime + 1) * numMSsInSecs) < Integer.MAX_VALUE){
-				timeToGrow = random.nextInt((maxGrowTime + 1) * numMSsInSecs); 
+			if(((maxGrowTime * numMSsInSecs) + 1) < Integer.MAX_VALUE){
+				timeToGrow = random.nextInt((maxGrowTime * numMSsInSecs) + 1); 
 			} else {
 				timeToGrow = random.nextInt(maxGrowTime + 1) * numMSsInSecs; 
 			}	
@@ -74,7 +78,20 @@ public class Customer implements Runnable{
 			mySalon.postOnSalonMessageBoard(this + " growing hair for " + timeToGrow + " ms");
 			
 			try {
+				long tempStart, tempEnd, tempWait;
+				tempStart = System.currentTimeMillis();				
 				Thread.sleep(timeToGrow);
+				tempEnd = System.currentTimeMillis();	
+				tempWait = timeToGrow - (tempEnd - tempStart);
+				
+				while(0 < tempWait){
+					//Make sure we grow for at least the time we say we will
+					tempStart = System.currentTimeMillis();
+					Thread.sleep(tempWait);
+					tempEnd = System.currentTimeMillis();
+					
+					tempWait = tempWait - (tempEnd - tempStart);
+				}				
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -83,11 +100,27 @@ public class Customer implements Runnable{
 			mySalon.postOnSalonMessageBoard(this + " needs a haircut");
 			
 			//Blocking call
-			mySalon.waitForHaircut(this);
-			//We'll have left that call only if we got our hair cut or if the salon is closed. 
-			//Either way, the loop will handle the next step appropriately.
+			haircutDone = mySalon.waitForHaircut(this);
+			//We'll have left that call only if we got into the waiting room or if the salon is closed.
+			//If we got back a non-null value for the Barrier, we're awaiting a haircut.
+			
+			if(haircutDone != null){
+				try {
+					//Now that we're in the waiting room, wait until our hair is cut.
+					haircutDone.await();
+					mySalon.postOnSalonMessageBoard(this + " has finished getting their hair cut");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BrokenBarrierException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}			
+			}				
 			
 		}
+		
+		mySalon.postOnSalonMessageBoard(this + " went home because the salon was closed.");
 		
 		return;
 	}

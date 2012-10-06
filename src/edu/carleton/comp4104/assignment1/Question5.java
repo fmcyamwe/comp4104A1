@@ -6,11 +6,7 @@
 
 package edu.carleton.comp4104.assignment1;
 
-import java.util.Timer;
-
 public class Question5 {
-	
-	private final static int millisecondsInSeconds = 1000;
 	
 	private static void printHelpMessage(){
 		System.out.println("This program expects the following arguments:\n"
@@ -46,7 +42,6 @@ public class Question5 {
 		int maxCutTime = 0;
 		int numChairs = 0;
 		int runtime = 0;
-		Timer runtimeTimer = new Timer("Salon Close Timer");
 		Salon mySalon;
 		Customer[] myCustomers;
 		Barber[] myBarbers;
@@ -192,9 +187,6 @@ public class Question5 {
 			myThreads[i + numBarbers].start();			
 		}
 		
-		//Schedule our task to close the salon after 'runtime' seconds has elapsed.
-		runtimeTimer.schedule(new SalonCloser(mySalon), (long) (runtime * millisecondsInSeconds));
-		
 		mySalon.startDay();
 		
 		//Wait for all of the Barbers and Customers to finish.
@@ -208,6 +200,8 @@ public class Question5 {
 		}
 		
 		mySalon.closingPerimiterCheck();
+		
+		return;
 	}
 
 }

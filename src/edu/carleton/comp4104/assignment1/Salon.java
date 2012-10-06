@@ -7,6 +7,7 @@
 package edu.carleton.comp4104.assignment1;
 
 import java.util.HashMap;
+import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -22,12 +23,14 @@ public class Salon {
 	private HashMap<Customer, CyclicBarrier> paymentBarriers;
 	private final int numMSsInSecs = 1000;
 	private boolean dayStarted = false;
+	private Timer runtimeTimer;
 	
 	public Salon(int numChairs, int numBarbers, int timeToStayOpen) {
 		waitingChairs = new ArrayBlockingQueue<Customer>(numChairs);
 		barberChairs = new ArrayBlockingQueue<Customer>(numBarbers); 
 		paymentBarriers = new HashMap<Customer, CyclicBarrier>(numChairs);
 		closingTime = (timeToStayOpen * numMSsInSecs);
+		runtimeTimer = new Timer("Salon Close Timer");
 	}
 	
 	/**
@@ -47,6 +50,8 @@ public class Salon {
 	 */
 	public synchronized void startDay(){
 		dayStarted = true;
+		//Schedule our task to close the salon after 'runtime' seconds has elapsed.
+		runtimeTimer.schedule(new SalonCloser(this), closingTime);
 		startTime = System.currentTimeMillis();
 		notifyAll();
 		return;
@@ -59,7 +64,7 @@ public class Salon {
 	 * @param msg to print. 'time = <current time in execution> secs,' will be prepended.
 	 */
 	public synchronized void postOnSalonMessageBoard(String msg){
-		System.out.println("time=" + ((System.currentTimeMillis() - startTime)/ numMSsInSecs) + " secs, " + msg);
+		System.out.println("time=" + (System.currentTimeMillis() - startTime) + " ms, " + msg);
 		return;
 	}
 	
@@ -81,6 +86,8 @@ public class Salon {
 	 */
 	public synchronized void closeSalon(){
 		salonOpen = false;
+		//This function is called by the timer we're about to cancel. The currently executing task will finish.
+		runtimeTimer.cancel();
 		System.out.println("Sorry, salon is closing. Everyone inside will get a cut but we won't be accepting new customers today.");
 		return;
 	}
@@ -89,35 +96,27 @@ public class Salon {
 	 * This function is used by Customers to get themselves into the Salon waiting room. This is a blocking call.
 	 * The Customer will only wait as long as the salon will remain open. That way whoever's not
 	 * in the waiting room when the timer goes off won't be stuck.
-	 * Once in the waiting room, the Customer waits until their hair is cut.
+	 * Once in the waiting room, the Customer is returned a non-null barrier on which they must wait until their hair is cut.
 	 * @param c The Customer that is trying to get into the waiting room to cut their hair.
+	 * @return returnBarrier null if the salon closed, otherwise a barrier on which the Customer must wait
+	 * for their haircut to complete.
 	 */
-	public synchronized void waitForHaircut(Customer c){
+	public synchronized CyclicBarrier waitForHaircut(Customer c){
 		long timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
+		CyclicBarrier returnBarrier = null;
 		
 		if(timeRemaining > 0){
 			try {				
 				//Try to get into the waiting room, only wait max as long as the salon will remain open, that way whoever's not
 				//in the waiting room when the timer goes off won't be stuck
 				if(waitingChairs.offer(c, timeRemaining, TimeUnit.MILLISECONDS)){
-					
+					notify();
 					postOnSalonMessageBoard(c + " in room, waiting=" + waitingChairs.size());
 					if(!paymentBarriers.containsKey(c)){
 						paymentBarriers.put(c, new CyclicBarrier(2));
 					}
-					//Now that we're in the waiting room, wait until our hair is cut.
-					CyclicBarrier haircutDone = paymentBarriers.get(c);
-					if(haircutDone != null){
-						try {
-							haircutDone.await();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (BrokenBarrierException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}			
-					}					
+					
+					returnBarrier = paymentBarriers.get(c);				
 				}
 				
 			} catch (InterruptedException e) {
@@ -126,7 +125,7 @@ public class Salon {
 			}
 		}
 		
-		return;
+		return returnBarrier;
 	}
 	
 	/**
@@ -168,16 +167,40 @@ public class Salon {
 		}
 		
 		//We only print part of the potential string here, then the rest if necessary later so don't use postOnSalonMessageBoard.
-		System.out.print("time=" + ((System.currentTimeMillis() - startTime)/ numMSsInSecs) + " secs, " +
+		System.out.print("time=" + (System.currentTimeMillis() - startTime) + " ms, " +
 		"Barber free");
 		
-		if((timeRemaining > 0) || (customerWaiting())){
+		if(salonOpen || (customerWaiting())){
 			try {
 				System.out.println(", waiting for a customer");
 				//Try to grab the next waiting customer, only wait max as long as the salon will remain open, that way whoever's not
 				//cutting hair when the timer goes off won't be stuck
-				c = waitingChairs.poll(timeRemaining, TimeUnit.MILLISECONDS);
-				
+				//Initially I was using the polling function that times out, but it appears to hog the Salon class that way.
+				c = waitingChairs.poll();
+				if(null == c){
+					long tempStart, tempEnd, tempWait;
+					tempStart = System.currentTimeMillis();
+					wait(((timeRemaining > 0) ? timeRemaining : 10));
+					tempEnd = System.currentTimeMillis();
+					tempWait = timeRemaining - (tempEnd - tempStart);
+							
+					c = waitingChairs.poll();
+					
+					while((null == c) && (0 < tempWait)){
+						//We're here if we broke out of the wait early.
+						//tempWait must be positive here because that subtracted difference is always positive or in an unlikely case 0.
+						//This will ensure that we never wait less than the time remaining.
+						
+						tempStart = System.currentTimeMillis();
+						wait(tempWait);
+						tempEnd = System.currentTimeMillis();
+						
+						tempWait = tempWait - (tempEnd - tempStart);
+						
+						c = waitingChairs.poll();
+					}			
+				}
+			
 				//If there is a Customer whose hair we must cut, put them in a Barber's chair.
 				if(c != null){
 					barberChairs.put(c);
@@ -190,7 +213,7 @@ public class Salon {
 			}
 		} else {
 			if(!salonOpen){
-				System.out.println(", no more customers, going home");
+				System.out.print(", no more customers, going home");
 			}
 			System.out.print("\n");
 		}
@@ -220,6 +243,7 @@ public class Salon {
 		if(!salonOpen && (!barberChairs.isEmpty() || !waitingChairs.isEmpty())){
 			System.out.println("\nUh-oh! The salon's closed, the barbers have gone home but there are still customers in here!");
 		}
+		return;
 	}
 
 }

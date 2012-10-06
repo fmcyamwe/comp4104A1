@@ -30,23 +30,37 @@ public class Barber implements Runnable{
 			e.printStackTrace();
 		}
 		
-		while(mySalon.salonOpen() || mySalon.customerWaiting()){
+		while(mySalon.salonOpen() || mySalon.customerWaiting() || (currentCustomer != null)){
 			long timeToCut;
 			//We want to sleep using ms, so if we can get a random time in ms, convert and do it. Otherwise, get a random number
 			//of seconds (opposed to ms) and convert that to ms.
-			if(((maxCutTime + 1) * numMSsInSecs) < Integer.MAX_VALUE){
-				timeToCut = random.nextInt((maxCutTime + 1) * numMSsInSecs); 
+			if(((maxCutTime * numMSsInSecs) + 1) < Integer.MAX_VALUE){
+				timeToCut = random.nextInt((maxCutTime * numMSsInSecs) + 1); 
 			} else {
 				timeToCut = random.nextInt(maxCutTime + 1) * numMSsInSecs; 
 			}
 			
 			//Blocking call
 			currentCustomer = mySalon.nextCustomer(currentCustomer);
-			
+
 			if(currentCustomer != null){
 				mySalon.postOnSalonMessageBoard(currentCustomer + " getting haircut for " + timeToCut + " ms");
 				try {
+					long tempStart, tempEnd, tempWait;
+					tempStart = System.currentTimeMillis();
 					Thread.sleep(timeToCut);
+					tempEnd = System.currentTimeMillis();
+					tempWait = timeToCut - (tempEnd - tempStart);
+					
+					while(0 < tempWait){
+						//Make sure we cut for at least the time we say we will
+						tempStart = System.currentTimeMillis();
+						Thread.sleep(tempWait);
+						tempEnd = System.currentTimeMillis();
+						
+						tempWait = tempWait - (tempEnd - tempStart);
+					}
+					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -55,6 +69,8 @@ public class Barber implements Runnable{
 			//If currentCustomer is null, the salon's closed. The loop will take care of it.
 
 		}
+		
+		mySalon.postOnSalonMessageBoard("A Barber has left, the salon is closed and there are no more customers.");
 		
 		return;
 	}
