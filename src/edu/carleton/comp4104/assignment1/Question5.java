@@ -49,7 +49,7 @@ public class Question5 {
 		
 		//Parse and ensure proper arguments
 		if(args.length != requiredNumArgs){
-			System.out.println("Insufficient number of arguments.");
+			System.out.println("Unsuitable number of arguments.");
 			printHelpMessage();
 			return;
 		}

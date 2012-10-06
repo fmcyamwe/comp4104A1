@@ -60,7 +60,7 @@ public class Salon {
 	 * Use this to make sure messages are printed out in an orderly manner as well as to allow us to keep 
 	 * the Customer and Barber ignorant to the time since we opened.
 	 * 
-	 * @param msg to print. 'time = <current time in execution> secs,' will be prepended.
+	 * @param msg to print. 'time = (current time in execution) ms,' will be prepended.
 	 */
 	public synchronized void postOnSalonMessageBoard(String msg){
 		System.out.println("time=" + (System.currentTimeMillis() - startTime) + " ms, " + msg);
@@ -96,11 +96,11 @@ public class Salon {
 	 * The Customer will only wait as long as the salon will remain open. That way whoever's not
 	 * in the waiting room when the timer goes off won't be stuck.
 	 * Once in the waiting room, the Customer is returned a non-null barrier on which they must wait until their hair is cut.
-	 * @param c The Customer that is trying to get into the waiting room to cut their hair.
+	 * @param waitingCustomer The Customer that is trying to get into the waiting room to cut their hair.
 	 * @return returnBarrier null if the salon closed, otherwise a barrier on which the Customer must wait
 	 * for their haircut to complete.
 	 */
-	public synchronized CyclicBarrier waitForHaircut(Customer c){
+	public synchronized CyclicBarrier waitForHaircut(Customer waitingCustomer){
 		long timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
 		CyclicBarrier returnBarrier = null;
 		
@@ -108,7 +108,7 @@ public class Salon {
 			try {				
 				//Try to get into the waiting room, only wait max as long as the salon will remain open, that way whoever's not
 				//in the waiting room when the timer goes off won't be stuck
-				boolean inWaitingRoom = waitingChairs.offer(c);
+				boolean inWaitingRoom = waitingChairs.offer(waitingCustomer);
 				
 				if(!inWaitingRoom){
 					long tempStart, tempEnd, tempWait;
@@ -117,7 +117,7 @@ public class Salon {
 					tempEnd = System.currentTimeMillis();
 					tempWait = timeRemaining - (tempEnd - tempStart);
 							
-					inWaitingRoom = waitingChairs.offer(c);
+					inWaitingRoom = waitingChairs.offer(waitingCustomer);
 					
 					while((!inWaitingRoom) && (0 < tempWait)){
 						//We're here if we broke out of the wait early.
@@ -130,19 +130,19 @@ public class Salon {
 						
 						tempWait = tempWait - (tempEnd - tempStart);
 						
-						inWaitingRoom = waitingChairs.offer(c);					
+						inWaitingRoom = waitingChairs.offer(waitingCustomer);					
 					}						
 				}
 				
 				if(inWaitingRoom){
 					//Notify any waiting Barbers (and sleeping Customers by side-effect) that waitingChairs changed
 					notifyAll();
-					postOnSalonMessageBoard(c + " in room, waiting=" + waitingChairs.size());
-					if(!paymentBarriers.containsKey(c)){
-						paymentBarriers.put(c, new CyclicBarrier(2));
+					postOnSalonMessageBoard(waitingCustomer + " in room, waiting=" + waitingChairs.size());
+					if(!paymentBarriers.containsKey(waitingCustomer)){
+						paymentBarriers.put(waitingCustomer, new CyclicBarrier(2));
 					}
 					
-					returnBarrier = paymentBarriers.get(c);				
+					returnBarrier = paymentBarriers.get(waitingCustomer);				
 				}
 				
 			} catch (InterruptedException e) {
@@ -165,7 +165,7 @@ public class Salon {
 	 * our next Customer.
 	 */
 	public synchronized Customer nextCustomer(Customer oldCustomer){
-		Customer c = null;
+		Customer nextInLine = null;
 		long timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
 
 		//On the first run, the oldCustomer will be null.
@@ -202,17 +202,17 @@ public class Salon {
 				//Try to grab the next waiting customer, only wait max as long as the salon will remain open, that way whoever's not
 				//cutting hair when the timer goes off won't be stuck
 				//Initially I was using the polling function that times out, but it appears to hog the Salon class that way.
-				c = waitingChairs.poll();
-				if(null == c){
+				nextInLine = waitingChairs.poll();
+				if(null == nextInLine){
 					long tempStart, tempEnd, tempWait;
 					tempStart = System.currentTimeMillis();
 					wait(((timeRemaining > 0) ? timeRemaining : 10));
 					tempEnd = System.currentTimeMillis();
 					tempWait = timeRemaining - (tempEnd - tempStart);
 							
-					c = waitingChairs.poll();
+					nextInLine = waitingChairs.poll();
 					
-					while((null == c) && (0 < tempWait)){
+					while((null == nextInLine) && (0 < tempWait)){
 						//We're here if we broke out of the wait early.
 						//tempWait must be positive here because that subtracted difference is always positive or in an unlikely case 0.
 						//This will ensure that we never wait less than the time remaining.
@@ -223,15 +223,15 @@ public class Salon {
 						
 						tempWait = tempWait - (tempEnd - tempStart);
 						
-						c = waitingChairs.poll();
+						nextInLine = waitingChairs.poll();
 					}	
 				}
 			
 				//If there is a Customer whose hair we must cut, put them in a Barber's chair.
-				if(c != null){
+				if(nextInLine != null){
 					//Notify any waiting customers (and sleeping Barbers by side-effect) that waitingChairs changed
 					notifyAll();					
-					barberChairs.put(c);
+					barberChairs.put(nextInLine);
 					postOnSalonMessageBoard("Barber has customer, waiting=" + waitingChairs.size());
 					postOnSalonMessageBoard("Barber cutting hair");			
 				}
@@ -246,7 +246,7 @@ public class Salon {
 			System.out.print("\n");
 		}
 		
-		return c;
+		return nextInLine;
 	}
 	
 	/**
