@@ -19,11 +19,27 @@ public class Salon {
 	private long closingTime;
 	private ArrayBlockingQueue<Customer> waitingChairs;
 	private ArrayBlockingQueue<Customer> barberChairs;
+	//These barriers in paymentBarriers are used to make Customers currently being  
+	//serviced wait until they've got their hair cut to continue their loop
 	private HashMap<Customer, CyclicBarrier> paymentBarriers;
 	private final int numMSsInSecs = 1000;
 	private boolean dayStarted = false;
 	private Timer runtimeTimer;
 	
+	/**
+	 * The salon class is used to synchronize Barbers and Customers.
+	 * Customers are serviced in the order in which they successfully 
+	 * entered the 'waiting room' (that is when they've been 
+	 * assigned a chair). Once the salon is closed (timeToStayOpen 
+	 * seconds have elapsed), the Barbers finish servicing any Customers
+	 * still in the salon (i.e. Customers whose hair is currently being
+	 * cut and Customers who have a chair in the waiting room).
+	 * @param numChairs The number of chairs in the salon's waiting room
+	 * @param numBarbers The number of barbers working in the salon
+	 * @param timeToStayOpen The length of time to stay open (the time
+	 * until we change the control variable signaling the threads to
+	 * finish execution)
+	 */
 	public Salon(int numChairs, int numBarbers, int timeToStayOpen) {
 		waitingChairs = new ArrayBlockingQueue<Customer>(numChairs);
 		barberChairs = new ArrayBlockingQueue<Customer>(numBarbers); 
@@ -45,7 +61,7 @@ public class Salon {
 	
 	/**
 	 * Releases the latch to start all of the Customers and Barbers.
-	 * Also sets the startTime.
+	 * Also sets the startTime and starts the Timer that will eventually close the salon.
 	 */
 	public synchronized void startDay(){
 		dayStarted = true;
@@ -267,6 +283,10 @@ public class Salon {
 		return paymentBarriers.containsKey(c);
 	}
 	
+	/**
+	 * This function is called at the end of program execution from main.
+	 * It's just used to print out an error message if there are still Customers in the salon.
+	 */
 	public synchronized void closingPerimiterCheck(){
 		if(!salonOpen && (!barberChairs.isEmpty() || !waitingChairs.isEmpty())){
 			System.out.println("\nUh-oh! The salon's closed, the barbers have gone home but there are still customers in here!");
