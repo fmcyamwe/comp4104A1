@@ -274,16 +274,6 @@ public class Salon {
 	}
 	
 	/**
-	 * This function is used by Customers to see if they're in the salon either waiting for a cut or being cut.
-	 * @param c The Customer to check for in the salon.
-	 * @return True if the Customer is waiting for a cut or being cut, false if the Customer's not in the salon.
-	 */
-	public synchronized boolean inSalon(Customer c){
-		//paymentBarriers will only contain the key if (waitingChairs.contains(c) || barberChairs.contains(c))) is true
-		return paymentBarriers.containsKey(c);
-	}
-	
-	/**
 	 * This function is called at the end of program execution from main.
 	 * It's just used to print out an error message if there are still Customers in the salon.
 	 */
