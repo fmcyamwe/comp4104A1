@@ -10,8 +10,9 @@ public class Question5 {
 	
 	private static void printHelpMessage(){
 		System.out.println("This program expects the following arguments:\n"
-				+ "-C <Number of Customers> -B <Number of Barbers> -g <Max Hair Growing Time in seconds> -c <Max Hair Cutting Time in seconds>" +
-				" -W <Number of Waiting Room Chairs> -R <program runtime in seconds>\n"
+				+ "-C <Number of Customers> -B <Number of Barbers, at least 1> " +
+				"-g <Max Hair Growing Time in seconds> -c <Max Hair Cutting Time in seconds>" +
+				" -W <Number of Waiting Room Chairs, at least 1> -R <program runtime in seconds>\n"
 				+ "where everything between '<>' (including the '<>') is a positive integer (E.G. -MyFlag 7). " +
 				"Please ensure your arguments " +
 				"conform to these expectations and try again.");
@@ -37,10 +38,10 @@ public class Question5 {
 		boolean seenNumCust = false, seenNumBarbs = false, seenGrowTime = false, seenCuttingTime = false, seenNumChairs = false, seenRuntime = false;		
 		final int requiredNumArgs = 12;
 		int numCustomers = 0;
-		int numBarbers = 0;
+		int numBarbers = 1;
 		int maxGrowTime = 0;
 		int maxCutTime = 0;
-		int numChairs = 0;
+		int numChairs = 1;
 		int runtime = 0;
 		Salon mySalon;
 		Customer[] myCustomers;
@@ -75,8 +76,8 @@ public class Question5 {
 				case("-B"):
 					try{
 						numBarbers = Integer.parseInt(args[argNum++]);
-						if(0 > numBarbers){
-							printNegativeValueArguments();
+						if(1 > numBarbers){
+							System.out.println("There must be at least 1 Barber. Try again.");
 							printHelpMessage();
 							return;
 						}	
@@ -123,8 +124,9 @@ public class Question5 {
 				case("-W"):
 					try{
 						numChairs = Integer.parseInt(args[argNum++]);
-						if(0 > numChairs){
-							printNegativeValueArguments();
+						if(1 > numChairs){
+							System.out.println("There must be at least 1 chair in " +
+									"the waiting room. Try again.");
 							printHelpMessage();
 							return;
 						}		
@@ -168,26 +170,22 @@ public class Question5 {
 		
 		System.out.println("customers " + numCustomers + ", barber " + numBarbers + ", max grow time " + maxGrowTime + 
 				", max cut time " + maxCutTime + ", chairs " + numChairs + ", runtime " + runtime);
-//TODO Check for and handle 0 barbers / customers
+
 		//Now that we know suitable arguments have been passed in, instantiate the required variables
-		
+		myBarbers = new Barber[numBarbers];
 		myThreads = new Thread[numBarbers + numCustomers];
-		
+		//Customer array conditionally initialised below
 		mySalon = new Salon(numChairs, numBarbers, runtime);
 		
-		if(numBarbers > 0){
-			myBarbers = new Barber[numBarbers];
-			//We can start these threads right away because they wait on a latch in the salon object
-			for(int i = 0; i < numBarbers; ++i){
-				myBarbers[i] = new Barber(mySalon, maxCutTime);
-				myThreads[i] = new Thread(myBarbers[i], "Barber " + (i + 1));
-				myThreads[i].start();
-			}
+		//We can start these threads right away because they wait on a latch in the salon object
+		for(int i = 0; i < numBarbers; ++i){
+			myBarbers[i] = new Barber(mySalon, maxCutTime);
+			myThreads[i] = new Thread(myBarbers[i], "Barber " + (i + 1));
+			myThreads[i].start();
 		}
 		
 		if(numCustomers > 0){
 			myCustomers = new Customer[numCustomers];
-			
 			for(int i = 0; i < numCustomers; ++i){
 				myCustomers[i] = new Customer(mySalon, maxGrowTime);
 				myThreads[i + numBarbers] = new Thread(myCustomers[i], myCustomers[i].toString());
