@@ -217,7 +217,6 @@ public class Salon {
 				System.out.println(", waiting for a customer");
 				//Try to grab the next waiting customer, only wait max as long as the salon will remain open, that way whoever's not
 				//cutting hair when the timer goes off won't be stuck
-				//Initially I was using the polling function that times out, but it appears to hog the Salon class that way.
 				nextInLine = waitingChairs.poll();
 				if(null == nextInLine){
 					long tempStart, tempEnd, tempWait;

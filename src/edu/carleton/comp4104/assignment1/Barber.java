@@ -68,9 +68,16 @@ public class Barber implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			} else {
+				//If currentCustomer is null, the salon's about to close.
+				//Still, sleep little bit so our loop condition works properly.
+				try {
+					Thread.sleep(5);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
 			}
-			//If currentCustomer is null, the salon's closed. The loop will take care of it.
-
 		} /* while(mySalon.salonOpen() || mySalon.customerWaiting() || (currentCustomer != null)) */
 		
 		mySalon.postOnSalonMessageBoard("A Barber has left, the salon is closed and there are no more customers.");
