@@ -1,4 +1,9 @@
 @ECHO OFF
+
+REM Anthony D'Angelo 100773125
+REM Tsering Chopel 100649290
+REM Florent Muyango 100709054
+
 TITLE Comp 4104 A1 Tests
 
 REM Check if we have a path to the Java binaries, 
