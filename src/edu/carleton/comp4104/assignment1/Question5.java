@@ -168,25 +168,31 @@ public class Question5 {
 		
 		System.out.println("customers " + numCustomers + ", barber " + numBarbers + ", max grow time " + maxGrowTime + 
 				", max cut time " + maxCutTime + ", chairs " + numChairs + ", runtime " + runtime);
-
+//TODO Check for and handle 0 barbers / customers
 		//Now that we know suitable arguments have been passed in, instantiate the required variables
-		myBarbers = new Barber[numBarbers];
-		myCustomers = new Customer[numCustomers];
+		
 		myThreads = new Thread[numBarbers + numCustomers];
 		
 		mySalon = new Salon(numChairs, numBarbers, runtime);
 		
-		//We can start these threads right away because they wait on a latch in the salon object
-		for(int i = 0; i < numBarbers; ++i){
-			myBarbers[i] = new Barber(mySalon, maxCutTime);
-			myThreads[i] = new Thread(myBarbers[i], "Barber " + (i + 1));
-			myThreads[i].start();
+		if(numBarbers > 0){
+			myBarbers = new Barber[numBarbers];
+			//We can start these threads right away because they wait on a latch in the salon object
+			for(int i = 0; i < numBarbers; ++i){
+				myBarbers[i] = new Barber(mySalon, maxCutTime);
+				myThreads[i] = new Thread(myBarbers[i], "Barber " + (i + 1));
+				myThreads[i].start();
+			}
 		}
 		
-		for(int i = 0; i < numCustomers; ++i){
-			myCustomers[i] = new Customer(mySalon, maxGrowTime);
-			myThreads[i + numBarbers] = new Thread(myCustomers[i], myCustomers[i].toString());
-			myThreads[i + numBarbers].start();			
+		if(numCustomers > 0){
+			myCustomers = new Customer[numCustomers];
+			
+			for(int i = 0; i < numCustomers; ++i){
+				myCustomers[i] = new Customer(mySalon, maxGrowTime);
+				myThreads[i + numBarbers] = new Thread(myCustomers[i], myCustomers[i].toString());
+				myThreads[i + numBarbers].start();			
+			}
 		}
 		
 		//Releases the latch, lets our threads start at the same time. Also sets up the program timer.
