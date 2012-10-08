@@ -119,15 +119,18 @@ public class Question3 {
 		
 		myControl.startDay();
 		
-		//Wait for everyone to finish.
-		for(Thread t:myThreads){
-			try {
-				t.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		//Wait for the timer to go off, collect the Eaters, clear the table and collect the Agent.
+		try {
+			myThreads[0].join();
+			myThreads[1].join();		
+			myThreads[2].join();
+		    myControl.clearTable();
+		    myThreads[3].join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 		
 		return;
 	}

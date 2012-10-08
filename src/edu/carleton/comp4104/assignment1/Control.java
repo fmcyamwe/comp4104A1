@@ -157,24 +157,11 @@ public class Control {
 		timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
 		
 		if(timeRemaining > 0){
-			//Wait for the table to be cleared, but only wait as long as we have time left.
+			//Wait for the table to be cleared. We won't be stuck because in the main, we join all other threads, clear the table, then join Agent's.
 			try{
-				long tempStart, tempEnd, tempWait;
-				tempStart = System.currentTimeMillis();
-				wait(((timeRemaining > 0) ? timeRemaining : 10));
-				tempEnd = System.currentTimeMillis();
-				tempWait = timeRemaining - (tempEnd - tempStart);
 				
-				while((!tableClear) && (0 < tempWait)){
-					//We're here if we broke out of the wait early.
-					//tempWait must be positive here because that subtracted difference is always positive or in an unlikely case 0.
-					//This will ensure that we never wait less than the time remaining.
-					
-					tempStart = System.currentTimeMillis();
-					wait(tempWait);
-					tempEnd = System.currentTimeMillis();
-					
-					tempWait = tempWait - (tempEnd - tempStart);
+				while(!tableClear){
+					wait();
 				}	
 
 				//We'll only break out of that while if food needs to be produced or if time is up.
@@ -235,7 +222,7 @@ public class Control {
 		kitchenOpen = false;
 		//This function is called by the timer we're about to cancel. The currently executing task will finish.
 		runtimeTimer.cancel();
-		System.out.println("Sorry, kitchen is closing. Everyone out! No soup for you!");
+		System.out.println("Sorry, kitchen is closing. Everyone finish up and get out!");
 		return;
 	}
 	
