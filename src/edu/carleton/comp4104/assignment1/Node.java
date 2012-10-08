@@ -1,3 +1,9 @@
+/**
+ * Anthony D'Angelo 100773125
+ * Tsering Chopel 100649290
+ * Florent Muyango 100709054 
+ */
+
 package edu.carleton.comp4104.assignment1;
 
 import java.util.ArrayList;
@@ -7,9 +13,9 @@ import java.util.concurrent.CountDownLatch;
 public class Node implements Runnable {
 	int label, messageCounter = 0;
 	Random random = new Random();
-	ArrayList<channel> chan = new ArrayList<channel>();
+	ArrayList<Channel> chan = new ArrayList<Channel>();
 	CountDownLatch signal;
-	int timer = Test.timer;
+	int timer = Question2.timer;
 	boolean run = true;
 
 	Node(int i, CountDownLatch startsignal) { // need the channel too ?!?
@@ -18,7 +24,7 @@ public class Node implements Runnable {
 
 	}
 
-	public void addChannel(channel ch) {
+	public void addChannel(Channel ch) {
 		chan.add(ch); // dont i add the node instead?
 	}
 
@@ -46,12 +52,12 @@ public class Node implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			for (channel ch : chan) {
+			for (Channel ch : chan) {
 				Message temp = createMessage();
 				send(temp, ch);
 
 			}
-			for (channel ch : chan) {
+			for (Channel ch : chan) {
 				Message temp = receive(ch);
 				if (temp.destination == this.label) {
 					System.out.println("Node " + this.label
@@ -74,7 +80,7 @@ public class Node implements Runnable {
 	}
 
 	public Message createMessage() {
-		int destination = random.nextInt(Test.system.size());
+		int destination = random.nextInt(Question2.system.size());
 		String message = "message number " + messageCounter;
 
 		Message temp = new Message(this.label, destination, message, "TimeNow");
@@ -83,8 +89,8 @@ public class Node implements Runnable {
 		return temp;
 	}
 
-	public void send(Message e, channel h) {
-		for (channel ch : chan) {
+	public void send(Message e, Channel h) {
+		for (Channel ch : chan) {
 			if (ch == h) {
 				ch.put(e, this);
 			}
@@ -93,7 +99,7 @@ public class Node implements Runnable {
 	}
 
 	// this is a weird one...y return the message?
-	public Message receive(channel recevingChannel) {
+	public Message receive(Channel recevingChannel) {
 
 		return recevingChannel.take(this);
 

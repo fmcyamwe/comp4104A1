@@ -1,11 +1,14 @@
+/**
+ * Anthony D'Angelo 100773125
+ * Tsering Chopel 100649290
+ * Florent Muyango 100709054 
+ */
+
 package edu.carleton.comp4104.assignment1;
 
-import java.io.IOException;
-import java.nio.channels.Channel;
-import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class channel implements Channel {
+public class Channel{
 	
 	int size ;
 	static int currentSize;
@@ -13,7 +16,7 @@ public class channel implements Channel {
 	ArrayBlockingQueue<Message> bufferNode1;
 	ArrayBlockingQueue<Message> bufferNode2;
 	
-	public channel(int s, Node node1, Node node2 ){
+	public Channel(int s, Node node1, Node node2 ){
 		this.node1=node1;
 		this.node2=node2;
 		this.size=s;
@@ -110,18 +113,6 @@ public class channel implements Channel {
 		}
 		return message;
 		
-	}
-
-	@Override
-	public void close() throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isOpen() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

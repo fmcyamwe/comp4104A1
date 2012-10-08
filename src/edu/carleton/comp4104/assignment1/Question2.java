@@ -1,3 +1,9 @@
+/**
+ * Anthony D'Angelo 100773125
+ * Tsering Chopel 100649290
+ * Florent Muyango 100709054 
+ */
+
 package edu.carleton.comp4104.assignment1;
 
 import java.io.*;
@@ -7,8 +13,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 
-public class Test {
-   
+
+public class Question2 {
+
 	//A STATIC ARRAY TO KEEP TRACK OF ALL THE NODES ?!? 
 	
 	static int nodenum = 0, channelsize = 0 , timer = 0 ;
@@ -87,9 +94,7 @@ public class Test {
 	        		int i = Integer.parseInt(items[0]);
 	        		int e = Integer.parseInt(items[1]);
 	        		makeThread(i,e);//prolly wil need somethin else		        		
-	        			//System.out.println(i);
-	        			//System.out.println(e);
-	        		
+        		
 	        	}
 	        	
 	        	//System.out.println(line); 
@@ -112,9 +117,9 @@ public class Test {
 		for(Node i: system){ //one of the node is already present in the system
 			if(i.label==sender || i.label== receiver ){
 				if(i.label==sender){//the sender is present so add the channel
-					i.addChannel(new channel(channelsize,i,new Node(receiver,startSignal)));
+					i.addChannel(new Channel(channelsize,i,new Node(receiver,startSignal)));
 				}else if(i.label==receiver) {//the receiver is the one present........may create a weird behavior of not knowing who is the sender or receiver.
-					i.addChannel(new channel(channelsize,i,new Node(sender,startSignal)));					
+					i.addChannel(new Channel(channelsize,i,new Node(sender,startSignal)));					
 				}
 				return; //dont continue and just get out
 			}			
@@ -124,7 +129,7 @@ public class Test {
 		system.add(tempNode1);
 		system.add(tempNode2);
 		
-		channel tempchannel= new channel(channelsize,tempNode1,tempNode2);
+		new Channel(channelsize,tempNode1,tempNode2);
 		
 		new Thread(tempNode1).start();
 		new Thread(tempNode2).start();

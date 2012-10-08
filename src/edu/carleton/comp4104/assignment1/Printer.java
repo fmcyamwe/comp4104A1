@@ -10,34 +10,28 @@ package edu.carleton.comp4104.assignment1;
 
 import java.util.ArrayList;
 import java.util.Random;
-//import java.util.concurrent.CountDownLatch;
 
 public class Printer implements Runnable{
-	//CountDownLatch latch = null;
-	static ArrayList <Boolean> print; 
+	static ArrayList <Boolean> print; //probably should pass the arraylist as argument inside constructor. from design point of view?
 	char character;
 	int order;
 	
 	
 	public Printer(char character, int order){
-		//this.latch = latch;
 		this.character = character;
 		this.order = order;
-		//print[0] = true;
 	}
 	
 	public void run(){
-		//System.out.println("am i here"+ Thread.currentThread().getName());
 		Random random = new Random();
 		try {
 			Thread.sleep(random.nextInt(101));
-			//latch.await();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		
-		synchronized (print){ // am i synchronizing on arraylist object? but its also a variable and that too a static. 
+		synchronized (print){
 			while(!(print.get(order) == true)){
 				try {
 					print.wait();
@@ -45,7 +39,7 @@ public class Printer implements Runnable{
 					e.printStackTrace();
 				}
 			}
-				System.out.println(character);
+				System.out.print(character+", ");
 				print.set(order, false);
 				print.set(order+1, true);
 				print.notifyAll();
