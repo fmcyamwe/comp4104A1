@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 
 
-public class Q4Test {
+public class Question4 {
 
 	/**
 	 * @param args
