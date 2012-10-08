@@ -16,11 +16,12 @@ REM Add the folder to our Path variable. Make sure it's there.
 SET "Path=%Path%;%JAVA_HOME%"
 
 ECHO.
-ECHO The next few runs will demonstrate the robustness of the program with
+ECHO  The next few runs will demonstrate the robustness of the program with
 ECHO regards to program arguments.
-ECHO First we'll try calling it with arguments from Q5 (which is many more than needed here), then
-ECHO we'll try with no arguments, then we'll try with negative integers, then we'll try with letters
-ECHO instead of numbers, then we'll try with only one argument.
+ECHO  First we'll try calling it with arguments from Q5 (which is many more than 
+ECHO needed here), then we'll try with no arguments, then we'll try with negative 
+ECHO integers, then we'll try with letters instead of numbers, then we'll try 
+ECHO with only one argument.
 
 ECHO.
 PAUSE
@@ -61,7 +62,26 @@ ECHO.
 ECHO Now we'll start the tests with valid arguments.
 PAUSE
 
+ECHO.
+java -cp bin edu.carleton.comp4104.assignment1.Question3 -t 5 -r 2
+ECHO.
+ECHO.
+ECHO Press any key to continue to the next test run.
+PAUSE>nul
 
+ECHO.
+java -cp bin edu.carleton.comp4104.assignment1.Question3 -t 10 -r 2
+ECHO.
+ECHO.
+ECHO Press any key to continue to the next test run.
+PAUSE>nul
+
+ECHO.
+java -cp bin edu.carleton.comp4104.assignment1.Question3 -r 2 -t 20
+ECHO.
+ECHO.
+
+ECHO Done Q3 tests.
 
 ECHO.
 PAUSE
