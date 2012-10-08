@@ -15,6 +15,16 @@ SET "JAVA_HOME=C:\Software\Languages\Java\jdk1.7.0_01\bin"
 REM Add the folder to our Path variable. Make sure it's there.
 SET "Path=%Path%;%JAVA_HOME%"
 
+ECHO Now we'll run Question1 tests.
+ECHO.
+PAUSE
+CALL Question1Test.bat
+ECHO.
+ECHO Now we'll run Question1 tests again in the hopes of seeing different orderings.
+ECHO.
+PAUSE
+CALL Question1Test.bat
+ECHO.
 ECHO Now we'll run Question3 tests.
 ECHO.
 PAUSE
