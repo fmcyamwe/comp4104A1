@@ -2,9 +2,9 @@ package edu.carleton.comp4104.assignment1;
 
 import java.io.*;
 import java.util.ArrayList;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
-
 
 
 public class Test {
@@ -15,6 +15,7 @@ public class Test {
 	public static ArrayList<Node> system; 
 	static CountDownLatch startSignal;
 	
+	
 	/**
 	 * @param args
 	 */
@@ -22,8 +23,7 @@ public class Test {
 		// TODO Auto-generated method stub
 		//Paths path;  //TO BE USED 
 		File inputFile= null;
-		
-		
+			
 		startSignal= new CountDownLatch(1);
 		
 		for(int i =0;i<=6; i=i+2){

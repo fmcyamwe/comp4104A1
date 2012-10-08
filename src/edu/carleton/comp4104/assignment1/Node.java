@@ -61,7 +61,8 @@ public class Node implements Runnable {
 			}
 			
 
-			timer--;
+			timer--;  
+			
 		}
 
 		// TODO Auto-generated method stub
