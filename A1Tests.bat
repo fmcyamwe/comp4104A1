@@ -19,16 +19,31 @@ ECHO Now we'll run Question1 tests.
 ECHO.
 PAUSE
 CALL Question1Test.bat
+
 ECHO.
 ECHO Now we'll run Question1 tests again in the hopes of seeing different orderings.
 ECHO.
 PAUSE
 CALL Question1Test.bat
+
+ECHO.
+ECHO Now we'll run Question2 tests.
+ECHO.
+PAUSE
+CALL Question2Test.bat
+
 ECHO.
 ECHO Now we'll run Question3 tests.
 ECHO.
 PAUSE
 CALL Question3Test.bat
+
+ECHO.
+ECHO Now we'll run Question4 tests.
+ECHO.
+PAUSE
+CALL Question4Test.bat
+
 ECHO.
 ECHO Now we'll run Question5 tests.
 ECHO.

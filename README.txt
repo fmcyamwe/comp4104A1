@@ -18,8 +18,30 @@
  -The Eclipse project java compiler settings need to be set to use 1.7 (it is already set up that way but if you wanted
  to just import the source files only and not the entire project then make sure you're using 1.7). 
  
+ -We assume a basic familiarity with Eclipse (although you're likely much more familiar than we are). 
+ 
+ ------------------------------------------------
+ Setup
+ 
+ 1. The first thing to do is to extract the submitted zip file to a local folder (which you've probably done since you're reading
+ this file).
+ 
+ 2. Start up Eclipse on one of the computers in the HP labs (we were in HP 4115 but the configurations should be the same on at 
+ least all HP building lab computers).
+ 
+ 3. Select to import a project from the local file system. Select the 4104-A1 project that was unzipped along with this README. 
+ It should not matter whether or not you copy the project to your workspace.
+ 
+ 4. Eclipse should have compiled everything for you. We've provided batch files you can run to test the submission (see below), 
+ otherwise you can make a new launch configuration from Eclipse for each of 'Question*.java' launching it as a 'java application' 
+ then you can provide your own arguments. Once compiled by Eclipse, you should also be able to run the programs from the command 
+ prompt by navigating to the project folder (where the provided batch files are) and (assuming the jre folder is on your system 
+ path as it is in the HP lab computers) running 'java -cp bin edu.carleton.comp4104.assignment1.Question* <my arguments>' where 
+ the * is the question you want to test and the arguments are valid arguments.
+ 
  -----------------------------------------------
  Running the automated tests:
+ 
  -There are two options to run the provided automated tests. The first is to run 'A1Tests.bat'. You will be prompted before the tests 
  to make sure you're ready to move on. The second way is to run 'Question*Test.bat' where * is the question number you want
  to test. The 'A1Tests.bat' batch file calls these 'Question*Test.bat' batch files. Of course, these scripts can either be
