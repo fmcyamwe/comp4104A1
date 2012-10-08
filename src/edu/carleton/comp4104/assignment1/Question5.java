@@ -31,7 +31,7 @@ public class Question5 {
 	}
 
 	/**
-	 * @param args
+	 * @param args See printHelpMessage.
 	 */
 	public static void main(String[] args) {
 		int argNum = 0;
@@ -157,7 +157,7 @@ public class Question5 {
 				default:
 					printHelpMessage();
 					return;
-			}
+			} /* while(argNum < requiredNumArgs) */
 			
 		}
 		
@@ -174,7 +174,7 @@ public class Question5 {
 		//Now that we know suitable arguments have been passed in, instantiate the required variables
 		myBarbers = new Barber[numBarbers];
 		myThreads = new Thread[numBarbers + numCustomers];
-		//Customer array conditionally initialised below
+		//Customer array conditionally initialized below
 		mySalon = new Salon(numChairs, numBarbers, runtime);
 		
 		//We can start these threads right away because they wait on a latch in the salon object
