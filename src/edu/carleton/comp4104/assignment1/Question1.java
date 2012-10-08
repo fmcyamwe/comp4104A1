@@ -7,81 +7,75 @@
 package edu.carleton.comp4104.assignment1;
 
 import java.util.ArrayList;
-import java.util.Random;
-//import java.util.concurrent.CountDownLatch;
+import java.util.Stack;
+import java.util.Collections;
 
 public class Question1{
 	
 	public static void main(String[] args) {
-		
-		//CountDownLatch latch = new CountDownLatch(1);
 		String st = args[0];
-		//String copy = st;
-		int length = st.length();
+		System.out.println(st);
 		
+		ArrayList<Character> theList = manageString(st);
+		System.out.println(theList);
+		int length = theList.size();
 		
-		//System.out.println(ch);
+		char [] characters = new char[length];
 		
-		for(int i = 0; i< st.length(); i++){
-			if(st.charAt(i)=='{'){  // need to take care of embedded curly brackets. {{}}, right now first and third curly bracket are considered one
-				//System.out.println("{ was detected, so i can use == to compare");
-				for(int j = 0; j< st.substring(i).length(); j++){
-					if(st.substring(i).charAt(j)=='}'){
-						char c = onlyOnechar(st.substring(i, j));
-						System.out.println(c);
-						i += j+1;
-					}
-				}	
-			}
-			System.out.println(st.charAt(i));
+		for(int i = 0;i<length; i++	){
+			characters[i] = theList.get(i);
 		}
 		
-//		char [] characters = new char[length]; // fill it up with characters in order of first character at zero index
-//		
-//		for(int i = 0;i<length; i++	){
-//			characters[i] = s.charAt(i);
-//		}
-//		
-//		Printer.print = new ArrayList<Boolean>(length);
-//		for(int i = 0;i<length; i++	){
-//			Printer.print.add(i, false); // initializes the new boolean inside Arraylist 
-//		}
-//		
-//		Printer.print.add(0,true);
-//		
-//		for(int i = 0;i<length; i++	){
-//			Thread t = new Thread(new Printer(characters[i], i), "Thread "+i);
-//			t.start();
-//		}
-		
-		
-		
-	}
-	
-	public static String randomize(String s){
-		if(s.length() == 1)
-			return s;
-		
-		for(char c: s.toCharArray()){
-			if(c=='['){
-				
-			}
+		Printer.print = new ArrayList<Boolean>(length);
+		for(int i = 0;i<length; i++	){
+			Printer.print.add(i, false); // initializes the new boolean inside Arraylist 
 		}
-		return s;
-	}
-	
-	public static char onlyOnechar(String s){
-		Random random = new Random();
-		int index = random.nextInt(s.length());
-		char [] c = s.toCharArray();
 		
-		if(c[index] == '[')
-			randomize(s.substring(index));
-		else if(c[index]=='{')
-			 return onlyOnechar(s.substring(index+1));
-		else
-			return c[index];
-		return 0;
-	}
+		Printer.print.add(0,true);
+		
+		for(int i = 0;i<length; i++	){
+			Thread t = new Thread(new Printer(characters[i], i), "Thread "+i);
+			t.start();
+		}
+		
+		
+		
+	}//    ab{123[ABC]456}cd   ab[123{ABC}456]cd
 
+	public static ArrayList<Character> manageString(String s){
+		ArrayList <Character> list = new ArrayList<Character>();
+		Stack <Integer> temp = new Stack<Integer>();
+		for(char c: s.toCharArray()){
+			list.add(c);
+		}
+		
+		for(int index = 0; index<list.size(); index++){		
+			if(list.get(index)=='{'  || list.get(index)=='['){
+				temp.push(index);
+			}
+
+			if(list.get(index) == '}'){
+				int pop = temp.pop();
+				Collections.shuffle(list.subList(pop+1, index));
+				list.remove(pop);
+				index--;
+				list.remove(index);
+				index--;
+				for(int i = pop+1; i <=index;){
+					list.remove(i);
+					index--;
+				}
+			}
+			
+			if(list.get(index) == ']'){
+				int pop = temp.pop();
+				Collections.shuffle(list.subList(pop+1, index));
+				list.remove(pop);
+				index--;
+				list.remove(index);
+				index --;
+			}
+		}
+		return list;
+	}
 }
