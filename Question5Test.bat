@@ -16,9 +16,9 @@ REM Add the folder to our Path variable. Make sure it's there.
 SET "Path=%Path%;%JAVA_HOME%"
 
 ECHO.
-ECHO The next few runs will demonstrate the robustness of the program with
+ECHO  The next few runs will demonstrate the robustness of the program with
 ECHO regards to program arguments.
-ECHO First we'll try calling it with no waiting room chairs, then with
+ECHO  First we'll try calling it with no waiting room chairs, then with
 ECHO negative numbers, then with letters instead of numbers, then with
 ECHO no arguments, then with no barbers.
 ECHO.
