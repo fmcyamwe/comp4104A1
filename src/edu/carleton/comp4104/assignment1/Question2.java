@@ -8,7 +8,6 @@ package edu.carleton.comp4104.assignment1;
 
 import java.io.*;
 import java.util.ArrayList;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class Question2 {
 
-	//A STATIC ARRAY TO KEEP TRACK OF ALL THE NODES ?!? 
+
 	
 	static int nodenum = 0, channelsize = 0 , timer = 0 ;
 	public static ArrayList<Node> system; 
@@ -28,8 +27,8 @@ public class Question2 {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//Paths path;  //TO BE USED 
-		File inputFile= null;
+		//Paths path = null;  //TO BE USED 
+		String inputFile= null;
 			
 		startSignal= new CountDownLatch(1);
 		
@@ -37,7 +36,7 @@ public class Question2 {
 			
 			switch(args[i]){
 			case "-c":
-				inputFile= new File("C:\\Users\\Temp\\workspace\\q2\\src\\edu\\carleton\\comp4104\\assignment1\\" + args[i+1]);
+				inputFile= new java.io.File("").getAbsolutePath() + File.separator  + args[i+1];
 				break;
 			case "-t":
 				timer= Integer.parseInt(args[i+1]);
@@ -49,9 +48,15 @@ public class Question2 {
 			
 		}
 		
-		//File inputFile = new File("C:\\Users\\Temp\\workspace\\q2\\src\\edu\\carleton\\comp4104\\assignment1\\input.txt");
-	
-		getContents(inputFile);
+			FileReader r = null;
+			try {
+				r = new FileReader(inputFile);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+			getContents(r);
 		
 		System.out.println("Starting");
 		startSignal.countDown();// start the threads
@@ -64,7 +69,7 @@ public class Question2 {
 
 	}
 	
-	public static void getContents(File aFile) {
+	public static void getContents(FileReader aFile) {
 	    
 	    //StringBuilder contents = new StringBuilder();
 	    int n=1;
@@ -75,7 +80,7 @@ public class Question2 {
 	    try {
 	      //use buffering, reading one line at a time
 	      //FileReader always assumes default encoding is OK!
-	      BufferedReader input =  new BufferedReader(new FileReader(aFile));
+	      BufferedReader input =  new BufferedReader(aFile);
 	      try{ 
 	        
 
@@ -93,7 +98,7 @@ public class Question2 {
 	        	
 	        		int i = Integer.parseInt(items[0]);
 	        		int e = Integer.parseInt(items[1]);
-	        		makeThread(i,e);//prolly wil need somethin else		        		
+	        		makeThread(i,e);//	        		
         		
 	        	}
 	        	

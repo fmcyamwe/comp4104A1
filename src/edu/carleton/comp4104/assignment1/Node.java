@@ -11,29 +11,29 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 public class Node implements Runnable {
-	int label, messageCounter = 0;
+	int label, messageCounter = 1;
 	Random random = new Random();
 	ArrayList<Channel> chan = new ArrayList<Channel>();
 	CountDownLatch signal;
-	int timer = Question2.timer;
+	int timer = Question2.timer ; //better way to time each node thread has to be implemented...
 	boolean run = true;
 
-	Node(int i, CountDownLatch startsignal) { // need the channel too ?!?
+	Node(int i, CountDownLatch startsignal) { 
 		this.label = i;
 		this.signal = startsignal;
 
 	}
 
 	public void addChannel(Channel ch) {
-		chan.add(ch); // dont i add the node instead?
+		chan.add(ch); 
 	}
 
 	@Override
 	public void run() {
-
+		
 		try {
 			signal.await();
-			// create the messages?!?
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -54,7 +54,11 @@ public class Node implements Runnable {
 			}
 			for (Channel ch : chan) {
 				Message temp = createMessage();
-				send(temp, ch);
+				
+				if(ch.node1.label==temp.source){
+					//send
+				}
+				send(temp, ch); 
 
 			}
 			for (Channel ch : chan) {
@@ -63,9 +67,13 @@ public class Node implements Runnable {
 					System.out.println("Node " + this.label
 							+ " received message from node " + temp.source
 							+ " at " + temp.time + ": " + temp.msg);
+				}else{//add it the list of message received that are not intended for you
+					System.out.println("Message not intend for me..redirecting..");
+					
+					send(temp,ch);
+					
 				}
-			}
-			
+			}			
 
 			timer--;  
 			
@@ -80,10 +88,11 @@ public class Node implements Runnable {
 	}
 
 	public Message createMessage() {
+		//picks a node number randomly from the system nodes
 		int destination = random.nextInt(Question2.system.size());
 		String message = "message number " + messageCounter;
 
-		Message temp = new Message(this.label, destination, message, "TimeNow");
+		Message temp = new Message(this.label, destination, message, timer);
 		messageCounter++;
 
 		return temp;
@@ -98,11 +107,9 @@ public class Node implements Runnable {
 
 	}
 
-	// this is a weird one...y return the message?
+	//return the message
 	public Message receive(Channel recevingChannel) {
-
 		return recevingChannel.take(this);
-
 	}
 
 }
