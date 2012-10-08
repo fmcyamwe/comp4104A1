@@ -9,10 +9,11 @@ TITLE Question 5 Tests
 REM Check if we have a path to the Java binaries, 
 REM otherwise we set it ourselves to the default.
 if "%JAVA_HOME%"=="" (
-SET "JAVA_HOME=C:\Program Files\Java\jdk1.7.0_07\bin"
-REM Add the folder to our Path variable
-SET "Path=%Path%;%JAVA_HOME%"
+SET "JAVA_HOME=C:\Software\Languages\Java\jdk1.7.0_01\bin"
 )
+
+REM Add the folder to our Path variable. Make sure it's there.
+SET "Path=%Path%;%JAVA_HOME%"
 
 ECHO.
 ECHO The next few runs will demonstrate the robustness of the program with
@@ -94,15 +95,16 @@ ECHO.
 ECHO Press any key to continue to the next test run.
 PAUSE>nul
 
+
 ECHO.
-java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 8 -B 6 -g 1 -c 1 -W 4 -R 3
+java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 5 -B 1 -g 1 -c 1 -W 5 -R 2
 ECHO.
 ECHO.
 ECHO Press any key to continue to the next test run.
 PAUSE>nul
 
 ECHO.
-java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 8 -B 5 -g 1 -c 1 -W 4 -R 3
+java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 8 -B 6 -g 1 -c 1 -W 4 -R 2
 ECHO.
 ECHO.
 ECHO Press any key to continue to the next test run.
@@ -116,14 +118,14 @@ ECHO Press any key to continue to the next test run.
 PAUSE>nul
 
 ECHO.
-java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 2 -B 8 -g 1 -c 1 -W 3 -R 3
+java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 2 -B 8 -g 1 -c 1 -W 3 -R 2
 ECHO.
 ECHO.
 ECHO Press any key to continue to the next test run.
 PAUSE>nul
 
 ECHO.
-java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 9 -B 3 -g 1 -c 1 -W 6 -R 3
+java -cp bin edu.carleton.comp4104.assignment1.Question5 -C 9 -B 3 -g 1 -c 1 -W 6 -R 2
 ECHO.
 ECHO.
 ECHO Done Q5 tests.
