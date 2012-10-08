@@ -12,7 +12,8 @@
  files.
  
  -Eclipse is necessary to run this assignment (with the 'Build Automatically' option checked in the 'Project' menu from
- the menu bar) as we didn't provide a separate Java makefile.
+ the menu bar) as we didn't provide a separate Java makefile. The HP labs default workspace settings are required (specifically
+ we're testing in HP 4115).
  
  -The Eclipse project java compiler settings need to be set to use 1.7 (it is already set up that way but if you wanted
  to just import the source files only and not the entire project then make sure you're using 1.7). 
@@ -44,8 +45,11 @@
  we can't use barriers or anything in the Agent or Eater class. We also assume this in Q5, except we assume an exception (which
  you'll find below in the Q5 section). The difference between this and Q 5 is that we wouldn't need to poll here once we return
  to the Eater thread like we do in Q5 to see if we're done our haircut.
+  
+ -We assume that when the question says the Agent unblocks the one Eater with the remaining ingredient it means that that's the overall
+ effect and not that we must wake up only the one Eater. Using only the monitor's wait and notify calls we can't single out any thread.
  
- -We assume a start latch is allowed.
+ -We assume a start latch is allowed to allow the threads to begin execution at the same time(-ish).
  
  -We assume that the passed-in runtime is the time at which the program should start gracefully exiting. That is to say when the timer
  goes off, we don't abruptly interrupt all of the threads and then exit. Because of this, we end up running a little longer than the 
@@ -74,6 +78,9 @@
  -We assume that the passed-in runtime is the time at which the program should start gracefully exiting. That is to say when the timer
  goes off, we don't abruptly interrupt all of the threads and then exit. Because of this, we end up running a little longer than the 
  time passed-in, but we exit gracefully.
+ 
+ -We assume that although Customers are serviced in order with respect to when they got a seat in the Salon, the order in which they 
+ enter the Salon after they finished growing their hair is supposed to be undetermined.
  
  -We assume printed output should be orderly (a sentence isn't interrupted half-way through with another sentence). That is only one
  thread prints out at a time.

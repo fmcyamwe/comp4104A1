@@ -50,6 +50,7 @@ public class Salon {
 	
 	/**
 	 * Used as a latch to synchronize all of the Customers and Barbers at startup.
+	 * This is a blocking call.
 	 * @throws InterruptedException
 	 */
 	public synchronized void waitForDayToStart() throws InterruptedException{

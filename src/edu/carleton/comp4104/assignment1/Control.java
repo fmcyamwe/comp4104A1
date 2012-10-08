@@ -101,6 +101,8 @@ public class Control {
 	 * This function is used by Eaters to wait until food is on the table (or until the runtime has elapsed)
 	 * at which point they'll wake up and check if the food on the table is for them and check if the kitchen's closed. 
 	 * 
+	 * This is a blocking call.
+	 * 
 	 * NOTE: I'd rather use barriers to signal the specific eater but the instructions make it sound like that's not allowed.
 	 * The instructions in Q5 sound similar, but in Q5 without barriers I'd have to continually poll to see if the customer's
 	 * still getting a haircut and that's terrible.
@@ -151,6 +153,9 @@ public class Control {
 	/**
 	 * This function is used by the Agent thread to let the Eaters know that there's food on the table and then
 	 * the Agent waits here until the table is ready to be used to prepare food again.
+	 * 
+	 * This is a blocking call.
+	 * 
 	 * @return True if the Agent should keep producing, false if the kitchen's about to close.
 	 */
 	public synchronized boolean waitForClearTable(){
@@ -187,6 +192,8 @@ public class Control {
 	
 	/**
 	 * Used as a latch to synchronize all of the Eaters and the Agent at startup.
+	 * This is a blocking call.
+	 * 
 	 * @throws InterruptedException
 	 */
 	public synchronized void waitForDayToStart() throws InterruptedException{
