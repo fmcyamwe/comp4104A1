@@ -12,6 +12,7 @@ public class Control {
 	private long startTime = 0;
 	private Timer runtimeTimer;
 	private ArrayBlockingQueue<String> table;
+	private boolean ingredientsBeingConsumed = false;
 	private boolean tableClear = true;
 	
 	/**
@@ -38,6 +39,15 @@ public class Control {
 	}
 	
 	/**
+	 * This is used by Eater threads to make sure they don't try to grab off the table in between the time the table is cleared and
+	 * ingredientsBeingConsumed is set back to false.
+	 * @return True if tableClear is true, else false.
+	 */
+	public synchronized boolean tableIsClear(){
+		return tableClear;
+	}
+	
+	/**
 	 * This function is used by Eaters to see if their ingredient is present on the table.
 	 * If it is, they go back to sleep. If it isn't, they proceed to consume the ingredients on the table. 
 	 * @param myIngredient The Eater's ingredient, one of potato, butter and water.
@@ -45,9 +55,11 @@ public class Control {
 	 * passed-in ingredient is on the table.
 	 */
 	public synchronized boolean checkTableForMissingIngredient(String myIngredient){
-		if(table.contains(myIngredient)){
+		if(table.contains(myIngredient) || (ingredientsBeingConsumed == true)){
 			return false;
 		} else {
+			//This variable ensures that every round only one Eater tries to eat.
+			ingredientsBeingConsumed = true;
 			return true;
 		}
 	}
@@ -139,6 +151,7 @@ public class Control {
 		long timeRemaining;
 		
 		//Tell the Eaters there's food on the table.
+		tableClear = false;
 		notifyAll();
 		
 		timeRemaining = closingTime - (System.currentTimeMillis() - startTime);
@@ -166,6 +179,7 @@ public class Control {
 
 				//We'll only break out of that while if food needs to be produced or if time is up.
 				if(tableClear){
+					ingredientsBeingConsumed = false;
 					return true;
 				}
 				

@@ -26,8 +26,10 @@ public class Eater implements Runnable {
 		}
 		
 		while(myKitchen.kitchenOpen()){
+			//Blocking call in the condition.
 			if(myKitchen.waitForIngredients()){
-				if(myKitchen.checkTableForMissingIngredient(myIngredient)){
+				//On the off chance the valid eater finishes running before the non-valid eaters
+				if(!myKitchen.tableIsClear() && myKitchen.checkTableForMissingIngredient(myIngredient)){
 					//This Eater has the missing ingredient, he can make himself food.
 					String first, second;
 					first = myKitchen.grabNextIngredientOnTable();

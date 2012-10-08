@@ -50,7 +50,7 @@ public class Question3 {
 		
 		while(argNum < requiredNumArgs){
 			switch(args[argNum++]){
-				case("-t"):
+				case("-r"):
 					try{
 						maxEatTime = Integer.parseInt(args[argNum++]);
 						if(1 > maxEatTime){
@@ -66,7 +66,7 @@ public class Question3 {
 					}					
 					break;
 				
-				case("-r"):
+				case("-t"):
 					try{
 						runtime = Integer.parseInt(args[argNum++]);
 						if(0 > runtime){
@@ -115,6 +115,7 @@ public class Question3 {
 			myThreads[i].start();			
 		}
 		myThreads[3] = new Thread(myAgent, "Agent");
+		myThreads[3].start();
 		
 		myControl.startDay();
 		
