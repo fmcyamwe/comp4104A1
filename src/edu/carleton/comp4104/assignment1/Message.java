@@ -10,9 +10,9 @@ package edu.carleton.comp4104.assignment1;
 		int source;
 		int destination;
 		String msg;
-		String time;
+		int time;
 	
-	Message(int s,int d,String mes,String t){
+	Message(int s,int d,String mes,int t){
 		setSource(s);
 		setDestination(d);
 		setMsg(mes);
@@ -43,11 +43,11 @@ package edu.carleton.comp4104.assignment1;
 		this.msg = msg;
 	}
 	
-	public String getTime() {
+	public int getTime() {
 		return time;
 	}
 	
-	public void setTime(String time) {
-		this.time = time;
+	public void setTime(int t) {
+		this.time = t;
 	}
 }
