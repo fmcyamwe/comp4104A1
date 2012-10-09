@@ -1,0 +1,4 @@
+A has-parts B C D
+D has-parts E F
+D before C
+D before B
