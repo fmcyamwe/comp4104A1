@@ -16,14 +16,7 @@ REM Add the folder to our Path variable. Make sure it's there.
 SET "Path=%Path%;%JAVA_HOME%"
 
 ECHO.
-java -cp bin edu.carleton.comp4104.assignment1.Question4
-ECHO.
-ECHO.
-ECHO Press any key to continue to the next test run.
-PAUSE>nul
-
-ECHO.
-java -cp bin edu.carleton.comp4104.assignment1.Question4
+ECHO Question 4 not completed.
 ECHO.
 ECHO.
 

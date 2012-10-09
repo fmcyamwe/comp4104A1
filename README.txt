@@ -59,8 +59,12 @@
  for the guideline that states that we must have error processing and exception handling.
  
  Q 1:
+ -We assume that that inner nesting is being processed first. For example, given < ab{123[ABC]456}cd > [ABC] will be shuffled 
+ first, then the string might look like < ab{123BCA456}cd > . Then, after processing {} braces, the string might look like 
+ < ab1cd >. In other words, [] shuffles first and then the {} then returns only one character.
  
  Q 2:
+ -Not completed.
  
  Q 3:
  -We assume that since the question says we need to use a monitor object and only call synchronized methods for synchronizing,
@@ -81,6 +85,7 @@
  thread prints out at a time.
  
  Q 4:
+ -Not completed.
  
  Q 5:
  -Like Q3, this question also says that we can only use the monitor object for synchronization which would mean that, like in Q3,
