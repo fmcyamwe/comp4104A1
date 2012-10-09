@@ -33,7 +33,8 @@ public class Node implements Runnable {
 	public void run() {
 		
 		try {
-			signal.await();
+			signal.await(); //latch that starts all the node threads
+			
 			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -67,7 +68,7 @@ public class Node implements Runnable {
 						}				
 				}
 				
-		if(!this.chan.isEmpty()){	
+			
 			Message tem;
 			for (Channel ch : chan) {				
 					tem = receive(ch);			
@@ -88,7 +89,7 @@ public class Node implements Runnable {
 					}					
 				}
 			}
-		}
+		
 
 			timer--;  
 			

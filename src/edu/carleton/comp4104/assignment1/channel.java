@@ -31,17 +31,7 @@ public class Channel{
 	}
 	 
 	public void put(Message mes, Node SendingNode){
-		
-		/*while(currentSize >= size){
-			try {
-				System.out.println("The channel between Node "+node1.label+" and Node "+ node2.label+ " is full! waiting...");
-				Thread.currentThread().sleep(new Random().nextInt(100));
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		*/
+
 		//assert !lock.isHeldByCurrentThread();
 		
 		//try{
@@ -58,7 +48,7 @@ public class Channel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else{ //its the second node sending so you put it in the second buffer
+		}else{ //if its the second node sending you put it in the second buffer
 			try {
 				synchronized(bufferNode2){
 					bufferNode2.put(mes);
@@ -79,16 +69,6 @@ public class Channel{
 	public Message take(Node receivingNode){
 		Message message = null;	
 		
-		/*while(currentSize <= 0){
-			try {
-				System.out.println("The channel between Node "+node1.label+" and Node "+ node2.label+ " is empty! waiting...");
-				Thread.currentThread().sleep(new Random().nextInt(100));
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		*/
 		//assert !lock.isHeldByCurrentThread();
 		//try{
 		

@@ -58,18 +58,20 @@ public class Question2 {
 		
 			getContents(r);
 		
-		System.out.println("Starting...");
+		System.out.println("Starting the threads...");
 		
 		startSignal.countDown();// start the threads
 	
-		//read the file and create the number of nodes
-		//then go throught the lines and for each line create 
-		// the two nodes and assign them OR create the channel 
+		
+		
 		
 		
 
 	}
 	
+	//read the file and create the number of nodes
+	//then go throught the lines and for each line create 
+	// the two nodes and assign them OR create the channel 
 	public static void getContents(FileReader aFile) {
 	    
 	    //StringBuilder contents = new StringBuilder();
@@ -80,12 +82,10 @@ public class Question2 {
 	    Pattern p = Pattern.compile(REGEX);
 	    try {
 	      //use buffering, reading one line at a time
-	      //FileReader always assumes default encoding is OK!
+	    
 	      BufferedReader input =  new BufferedReader(aFile);
 	      try{ 
-	        
-
-	        
+	    	  
 	        while (( line = input.readLine()) != null){
 	        	if(nodenum == 0){
 	        		nodenum = Integer.parseInt(line); 
@@ -103,11 +103,11 @@ public class Question2 {
         		
 	        	}
 	        	
-	        	//System.out.println(line); 
+	        
 	        }
 	      }
 	      finally {
-	    	  System.out.println("bonbon: " + n);  
+	    	  
 	        input.close();
 	      }
 	    }
@@ -118,9 +118,10 @@ public class Question2 {
 	   
 	  }
 
-	public static void makeThread(int sender, int receiver) {		
+	public static void makeThread(int sender, int receiver) {
 		
-		for(Node i: system){ //one of the node is already present in the system
+		//checks if one of the nodes is already present in the system
+		for(Node i: system){ 
 			if(i.label==sender || i.label== receiver ){
 				if(i.label==sender){//the sender is present so add the channel
 					i.addChannel(new Channel(channelsize,i,new Node(receiver,startSignal)));
@@ -139,6 +140,7 @@ public class Question2 {
 		
 		new Thread(tempNode1).start();
 		new Thread(tempNode2).start();
+		
 		
 	}
 
