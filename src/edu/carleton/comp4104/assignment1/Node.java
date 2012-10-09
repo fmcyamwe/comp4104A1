@@ -14,6 +14,7 @@ public class Node implements Runnable {
 	int label, messageCounter = 1;
 	Random random = new Random();
 	ArrayList<Channel> chan = new ArrayList<Channel>();
+	ArrayList<Message> messages = new ArrayList<Message>(100);
 	CountDownLatch signal;
 	int timer = Question2.timer ; //better way to time each node thread has to be implemented...
 	boolean run = true;
@@ -45,6 +46,7 @@ public class Node implements Runnable {
 			if (timer <= 0) {
 				run = false;
 			}
+			
 			Random r = new Random();
 			try {
 				Thread.sleep(r.nextInt(101));
@@ -52,39 +54,49 @@ public class Node implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			for (Channel ch : chan) {
-				Message temp = createMessage();
+			
+				Message temp = createMessage(); 
+		//attempts to send the message on the first channel...else it sends it to all the channels
+				if(!this.chan.isEmpty()){
+					if(chan.get(0).node1.label == temp.source)						
+						send(temp, chan.get(0)); 
+					else{
+						for(Channel ch:chan){							
+							send(temp,ch);
+							}
+						}				
+				}
 				
-				if(ch.node1.label==temp.source){
-					//send
-				}
-				send(temp, ch); 
-
-			}
-			for (Channel ch : chan) {
-				Message temp = receive(ch);
-				if (temp.destination == this.label) {
+		if(!this.chan.isEmpty()){	
+			Message tem;
+			for (Channel ch : chan) {				
+					tem = receive(ch);			
+				
+				if (tem.destination == this.label) {
 					System.out.println("Node " + this.label
-							+ " received message from node " + temp.source
-							+ " at " + temp.time + ": " + temp.msg);
-				}else{//add it the list of message received that are not intended for you
-					System.out.println("Message not intend for me..redirecting..");
-					
-					send(temp,ch);
-					
+							+ " received message from node " + tem.source
+							+ " at " + tem.time + ": " + tem.msg);
+				}else{
+					//add it the list of message received that are not intended for you
+					if(!messages.contains(tem)){
+						messages.add(tem);
+					}
+					//then broadcast it to all the channels except the one we are in.
+					for(Channel h : chan){
+						if(h.equals(ch)) return;
+						else send(temp,ch); System.out.println("Message not intend for me..redirecting..");
+					}					
 				}
-			}			
+			}
+		}
 
 			timer--;  
 			
 		}
+		
+		System.out.println("Thread done");
 
 		// TODO Auto-generated method stub
-
-		// create the random messages and send them or receive them...have to
-		// make a way to
-		// make a thread either send or receive only!
-
 	}
 
 	public Message createMessage() {
@@ -109,6 +121,7 @@ public class Node implements Runnable {
 
 	//return the message
 	public Message receive(Channel recevingChannel) {
+
 		return recevingChannel.take(this);
 	}
 

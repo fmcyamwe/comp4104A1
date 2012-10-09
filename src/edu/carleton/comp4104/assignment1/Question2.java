@@ -58,7 +58,8 @@ public class Question2 {
 		
 			getContents(r);
 		
-		System.out.println("Starting");
+		System.out.println("Starting...");
+		
 		startSignal.countDown();// start the threads
 	
 		//read the file and create the number of nodes
@@ -123,8 +124,8 @@ public class Question2 {
 			if(i.label==sender || i.label== receiver ){
 				if(i.label==sender){//the sender is present so add the channel
 					i.addChannel(new Channel(channelsize,i,new Node(receiver,startSignal)));
-				}else if(i.label==receiver) {//the receiver is the one present........may create a weird behavior of not knowing who is the sender or receiver.
-					i.addChannel(new Channel(channelsize,i,new Node(sender,startSignal)));					
+				}else if(i.label==receiver) { 
+					i.addChannel(new Channel(channelsize,new Node(sender,startSignal),i));					
 				}
 				return; //dont continue and just get out
 			}			

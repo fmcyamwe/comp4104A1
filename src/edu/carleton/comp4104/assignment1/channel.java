@@ -7,6 +7,7 @@
 package edu.carleton.comp4104.assignment1;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Channel{
 	
@@ -15,6 +16,7 @@ public class Channel{
 	Node node1,node2;
 	ArrayBlockingQueue<Message> bufferNode1;
 	ArrayBlockingQueue<Message> bufferNode2;
+	ReentrantLock lock = new ReentrantLock();
 	
 	public Channel(int s, Node node1, Node node2 ){
 		this.node1=node1;
@@ -40,6 +42,11 @@ public class Channel{
 			}
 		}
 		*/
+		//assert !lock.isHeldByCurrentThread();
+		
+		//try{
+		//lock.lock();
+		
 		if(SendingNode == node1){
 			try {
 				synchronized(bufferNode1){
@@ -62,11 +69,14 @@ public class Channel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		
-	}
+		} 
+			///}finally{
+			// lock.unlock();
+			//}
+		} 		
 	
-	public  Message take(Node receivingNode){
+	
+	public Message take(Node receivingNode){
 		Message message = null;	
 		
 		/*while(currentSize <= 0){
@@ -79,6 +89,9 @@ public class Channel{
 			}
 		}
 		*/
+		//assert !lock.isHeldByCurrentThread();
+		//try{
+		
 		if(receivingNode == node1){
 			try {
 				synchronized(bufferNode2){
@@ -111,6 +124,10 @@ public class Channel{
 				e.printStackTrace();
 			}
 		}
+		//}finally{
+		//	lock.unlock();
+		//}
+		
 		return message;
 		
 	}
