@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.CyclicBarrier;
 import java.util.regex.Pattern;
 
 public class Question4 {
@@ -44,7 +45,12 @@ public class Question4 {
 			e.printStackTrace();
 		}
 
-		getContents(r);
+		ArrayList<ArrayList<Character>> dependents = getContents(r);
+		
+		for(int i = 0; i< products.size()-1; i++){
+			Thread thread = new Thread(new Worker(products.get(i).charAt(i), new CyclicBarrier(dependents.get(i+1).size()), dependents));
+			thread.start();
+		} 
 
 	}
 
